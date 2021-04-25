@@ -109,6 +109,57 @@ func buildIdsString(Ids []int) string {
 
 }
 
+func GetAllTables(db *sqlx.DB) []models.CardTable {
+
+	tables := []models.CardTable{}
+	err := db.Select(&tables, "SELECT id, name FROM card_tables ORDER BY id ASC")
+	if err != nil {
+		panic(err)
+	}
+
+	return tables
+}
+
+//GetCListsToCTableLinks
+func GetCListToCTableIds(db *sqlx.DB, tableId int) ([]int, []models.CListsToCTableLink) {
+
+	cListsToCTableLinks := []models.CListsToCTableLink{}
+	err := db.Select(&cListsToCTableLinks, "SELECT cardlist_id, cardtable_id FROM card_lists_to_card_table WHERE cardtable_id=$1", tableId)
+	if err != nil {
+		panic(err)
+	}
+
+	cListsToCTableLinksCount := len(cListsToCTableLinks)
+	cListIds := make([]int, cListsToCTableLinksCount)
+
+	for i, el := range cListsToCTableLinks {
+		cListIds[i] = el.CListId
+	}
+
+	return cListIds, cListsToCTableLinks
+}
+
+func GetCListsByIds(db *sqlx.DB, cListIds []int) []models.CardList {
+
+	cardLists := []models.CardList{}
+	err := db.Select(&cardLists, "SELECT id, name FROM Card_Lists WHERE id IN("+buildIdsString(cListIds)+");")
+	if err != nil {
+		panic(err)
+	}
+
+	return cardLists
+}
+
+func GetCardsToClistLinksByIds(db *sqlx.DB, cardListsIds []int) []models.CardsToClistLink {
+	cardsToClistLinks := []models.CardsToClistLink{}
+	err := db.Select(&cardsToClistLinks, "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN("+buildIdsString(cardListsIds)+");")
+	if err != nil {
+		panic(err)
+	}
+
+	return cardsToClistLinks
+}
+
 func SeedDb() {
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
@@ -167,27 +218,33 @@ func SeedDb() {
 	//tx.NamedExec("INSERT INTO person (first_name, last_name, email) VALUES (:first_name, :last_name, :email)", &Person{"Jane", "Citizen", "jane.citzen@example.com"})
 	//tx.Commit()
 
-	tables := []models.CardTable{}
-	err = db.Select(&tables, "SELECT id, name FROM card_tables ORDER BY id ASC")
+	// tables := []models.CardTable{}
+	// err = db.Select(&tables, "SELECT id, name FROM card_tables ORDER BY id ASC")
+
+	tables := GetAllTables(db)
 
 	table1_Id := tables[0].Id
 
-	cListsToCTableLinks := []models.CListsToCTableLink{}
-	db.Select(&cListsToCTableLinks, "SELECT cardlist_id, cardtable_id FROM card_lists_to_card_table WHERE cardtable_id=$1", table1_Id)
+	cListIds, _ := GetCListToCTableIds(db, table1_Id)
 
-	cListsToCTableLinksCount := len(cListsToCTableLinks)
-	cListIds := make([]int, cListsToCTableLinksCount)
+	// cListsToCTableLinks := []models.CListsToCTableLink{}
+	// db.Select(&cListsToCTableLinks, "SELECT cardlist_id, cardtable_id FROM card_lists_to_card_table WHERE cardtable_id=$1", table1_Id)
 
-	for i, el := range cListsToCTableLinks {
-		cListIds[i] = el.CListId
-	}
+	// cListsToCTableLinksCount := len(cListsToCTableLinks)
+	// cListIds := make([]int, cListsToCTableLinksCount)
+
+	// for i, el := range cListsToCTableLinks {
+	// 	cListIds[i] = el.CListId
+	// }
 
 	//cListIdsString := buildIdsString(cListIds)
 
-	cardLists := []models.CardList{}
-	//query := "SELECT id, name FROM Card_Lists WHERE id IN(" + buildIdsString(cListIds) + ");"
-	//err = db.Select(&cardLists, "SELECT id, name FROM Card_Lists WHERE id IN($1)", cListIds)
-	err = db.Select(&cardLists, "SELECT id, name FROM Card_Lists WHERE id IN("+buildIdsString(cListIds)+");")
+	// cardLists := []models.CardList{}
+	// //query := "SELECT id, name FROM Card_Lists WHERE id IN(" + buildIdsString(cListIds) + ");"
+	// //err = db.Select(&cardLists, "SELECT id, name FROM Card_Lists WHERE id IN($1)", cListIds)
+	// err = db.Select(&cardLists, "SELECT id, name FROM Card_Lists WHERE id IN("+buildIdsString(cListIds)+");")
+
+	cardLists := GetCListsByIds(db, cListIds)
 
 	//cardListCount := len(cardLists)
 	cardListsIds := make([]int, len(cardLists))
@@ -198,11 +255,12 @@ func SeedDb() {
 
 	//cardListsIdsString := buildIdsString(cardListsIds)
 
-	cardsToClistLinks := []models.CardsToClistLink{}
-	//query = "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN(" + buildIdsString(cardListsIds) + ");"
-	//err = db.Select(&cardsToClistLinks, "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN($1)", cardListsIdsString)
-	err = db.Select(&cardsToClistLinks, "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN("+buildIdsString(cardListsIds)+");")
+	// cardsToClistLinks := []models.CardsToClistLink{}
+	// //query = "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN(" + buildIdsString(cardListsIds) + ");"
+	// //err = db.Select(&cardsToClistLinks, "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN($1)", cardListsIdsString)
+	// err = db.Select(&cardsToClistLinks, "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN("+buildIdsString(cardListsIds)+");")
 
+	cardsToClistLinks := GetCardsToClistLinksByIds(db, cardListsIds)
 	//cardsToClistLinksCount := len(cardsToClistLinks)
 
 	var cardsIds []int
@@ -240,25 +298,25 @@ func SeedDb() {
 	}
 
 	// assign cardLists to tables
-	for i, el := range tables {
+	table := tables[0]
 
-		for _, link := range cListsToCTableLinks {
-			if link.CTableId == el.Id {
+	table.CardLists = cardLists
 
-				// get CardList item assigned to current table
-				var cListItem models.CardList
-				for _, item := range cardLists {
-					if item.Id == link.CListId {
-						cListItem = item
-						break
-					}
-				}
+	// for _, link := range cListsToCTableLinks {
+	// 	if link.CTableId == table.Id {
 
-				tables[i].CardLists = append(tables[i].CardLists, cListItem)
-			}
-		}
+	// 		// get CardList item assigned to current table
+	// 		var cListItem models.CardList
+	// 		for _, item := range cardLists {
+	// 			if item.Id == link.CListId {
+	// 				cListItem = item
+	// 				break
+	// 			}
+	// 		}
 
-	}
+	// 		table.CardLists = append(table.CardLists, cListItem)
+	// 	}
+	// }
 
 	fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA!!!!!!!!!!")
 
