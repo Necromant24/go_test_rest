@@ -32,8 +32,6 @@ func main() {
 
 	DB.InitDBConnection()
 
-	//DB.SeedDb()
-
 	api.Run()
 
 }

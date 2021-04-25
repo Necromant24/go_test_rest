@@ -39,6 +39,8 @@ func Run() {
 
 		apiArea.POST("/cardlist", CreateCardList)
 
+		apiArea.POST("/card", CreateCard)
+
 	}
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
