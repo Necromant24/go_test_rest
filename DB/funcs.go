@@ -134,3 +134,17 @@ func GetAssignedCardsToCLists(db *sqlx.DB, cardLists []models.CardList) []models
 
 	return cardLists
 }
+
+// only assign CardLists with assigned Cards to CardLists
+func GetFullTableByTable(db *sqlx.DB, table models.CardTable) models.CardTable {
+
+	cListIds, _ := GetCListToCTableIds(db, table.Id)
+
+	cardLists := GetCListsByIds(db, cListIds)
+
+	cardLists = GetAssignedCardsToCLists(db, cardLists)
+
+	table.CardLists = cardLists
+
+	return table
+}
