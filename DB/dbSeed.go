@@ -3,9 +3,6 @@ package DB
 import (
 	"fmt"
 	"log"
-	"test/models"
-
-	"strconv"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -76,89 +73,6 @@ CREATE TABLE IF NOT EXISTS cards_to_card_list (
   );
 
 `
-
-func convertIntArrToInt64(items []int) []int64 {
-	var converted = make([]int64, len(items))
-
-	for i, el := range items {
-		converted[i] = int64(el)
-	}
-
-	return converted
-}
-
-func buildIdsString(Ids []int) string {
-	var ids = convertIntArrToInt64(Ids)
-
-	length := len(ids)
-
-	if length == 0 {
-		return ""
-	} else if length == 1 {
-		return strconv.FormatInt(ids[0], 10)
-	} else {
-
-		builder := strconv.FormatInt(ids[0], 10)
-
-		for i := 1; i < length; i++ {
-			builder += "," + strconv.FormatInt(ids[i], 10)
-		}
-
-		return builder
-	}
-
-}
-
-func GetAllTables(db *sqlx.DB) []models.CardTable {
-
-	tables := []models.CardTable{}
-	err := db.Select(&tables, "SELECT id, name FROM card_tables ORDER BY id ASC")
-	if err != nil {
-		panic(err)
-	}
-
-	return tables
-}
-
-//GetCListsToCTableLinks
-func GetCListToCTableIds(db *sqlx.DB, tableId int) ([]int, []models.CListsToCTableLink) {
-
-	cListsToCTableLinks := []models.CListsToCTableLink{}
-	err := db.Select(&cListsToCTableLinks, "SELECT cardlist_id, cardtable_id FROM card_lists_to_card_table WHERE cardtable_id=$1", tableId)
-	if err != nil {
-		panic(err)
-	}
-
-	cListsToCTableLinksCount := len(cListsToCTableLinks)
-	cListIds := make([]int, cListsToCTableLinksCount)
-
-	for i, el := range cListsToCTableLinks {
-		cListIds[i] = el.CListId
-	}
-
-	return cListIds, cListsToCTableLinks
-}
-
-func GetCListsByIds(db *sqlx.DB, cListIds []int) []models.CardList {
-
-	cardLists := []models.CardList{}
-	err := db.Select(&cardLists, "SELECT id, name FROM Card_Lists WHERE id IN("+buildIdsString(cListIds)+");")
-	if err != nil {
-		panic(err)
-	}
-
-	return cardLists
-}
-
-func GetCardsToClistLinksByIds(db *sqlx.DB, cardListsIds []int) []models.CardsToClistLink {
-	cardsToClistLinks := []models.CardsToClistLink{}
-	err := db.Select(&cardsToClistLinks, "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN("+buildIdsString(cardListsIds)+");")
-	if err != nil {
-		panic(err)
-	}
-
-	return cardsToClistLinks
-}
 
 func SeedDb() {
 
@@ -247,55 +161,57 @@ func SeedDb() {
 	cardLists := GetCListsByIds(db, cListIds)
 
 	//cardListCount := len(cardLists)
-	cardListsIds := make([]int, len(cardLists))
+	// cardListsIds := make([]int, len(cardLists))
 
-	for i, el := range cardLists {
-		cardListsIds[i] = el.Id
-	}
+	// for i, el := range cardLists {
+	// 	cardListsIds[i] = el.Id
+	// }
 
-	//cardListsIdsString := buildIdsString(cardListsIds)
+	// //cardListsIdsString := buildIdsString(cardListsIds)
 
-	// cardsToClistLinks := []models.CardsToClistLink{}
-	// //query = "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN(" + buildIdsString(cardListsIds) + ");"
-	// //err = db.Select(&cardsToClistLinks, "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN($1)", cardListsIdsString)
-	// err = db.Select(&cardsToClistLinks, "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN("+buildIdsString(cardListsIds)+");")
+	// // cardsToClistLinks := []models.CardsToClistLink{}
+	// // //query = "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN(" + buildIdsString(cardListsIds) + ");"
+	// // //err = db.Select(&cardsToClistLinks, "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN($1)", cardListsIdsString)
+	// // err = db.Select(&cardsToClistLinks, "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN("+buildIdsString(cardListsIds)+");")
 
-	cardsToClistLinks := GetCardsToClistLinksByIds(db, cardListsIds)
-	//cardsToClistLinksCount := len(cardsToClistLinks)
+	// cardsToClistLinks := GetCardsToClistLinksByIds(db, cardListsIds)
+	// //cardsToClistLinksCount := len(cardsToClistLinks)
 
-	var cardsIds []int
+	// var cardsIds []int
 
-	cardsIds = make([]int, len(cardsToClistLinks))
+	// cardsIds = make([]int, len(cardsToClistLinks))
 
-	for i, el := range cardsToClistLinks {
-		cardsIds[i] = el.CardId
-	}
+	// for i, el := range cardsToClistLinks {
+	// 	cardsIds[i] = el.CardId
+	// }
 
-	//cardsIdsString := buildIdsString(cardsIds)
+	// //cardsIdsString := buildIdsString(cardsIds)
 
-	var cards []models.Card
-	//query = "SELECT id,name,description FROM Card WHERE id IN(" + buildIdsString(cardsIds) + ")"
-	//err = db.Select(&cards, "SELECT id,name,description FROM Cards WHERE id IN($1)", cardsIdsString)
-	err = db.Select(&cards, "SELECT id,name,description FROM Card WHERE id IN("+buildIdsString(cardsIds)+")")
+	// var cards []models.Card
+	// //query = "SELECT id,name,description FROM Card WHERE id IN(" + buildIdsString(cardsIds) + ")"
+	// //err = db.Select(&cards, "SELECT id,name,description FROM Cards WHERE id IN($1)", cardsIdsString)
+	// err = db.Select(&cards, "SELECT id,name,description FROM Card WHERE id IN("+buildIdsString(cardsIds)+")")
 
-	// assign cards to cardLists
-	for i, el := range cardLists {
+	// // assign cards to cardLists
+	// for i, el := range cardLists {
 
-		for _, link := range cardsToClistLinks {
-			if link.CListId == el.Id {
+	// 	for _, link := range cardsToClistLinks {
+	// 		if link.CListId == el.Id {
 
-				var card models.Card
-				for _, item := range cards {
-					if item.Id == link.CardId {
-						card = item
-						break
-					}
-				}
+	// 			var card models.Card
+	// 			for _, item := range cards {
+	// 				if item.Id == link.CardId {
+	// 					card = item
+	// 					break
+	// 				}
+	// 			}
 
-				cardLists[i].Cards = append(cardLists[i].Cards, card)
-			}
-		}
-	}
+	// 			cardLists[i].Cards = append(cardLists[i].Cards, card)
+	// 		}
+	// 	}
+	// }
+
+	cardLists = GetAssignedCardsToCLists(db, cardLists)
 
 	// assign cardLists to tables
 	table := tables[0]
