@@ -4,8 +4,62 @@ import (
 	"strconv"
 	"test/models"
 
+	"fmt"
+	"log"
+
 	"github.com/jmoiron/sqlx"
 )
+
+const (
+	host     = "localhost"
+	port     = 5432
+	user     = "postgres"
+	password = "123"
+	dbname   = "postgres"
+)
+
+var db *sqlx.DB
+
+func CreateTable(table models.CardTable) error {
+	_, err := db.Exec("INSERT INTO Card_Tables (name) VALUES ($1)", table.Name)
+
+	return err
+}
+
+func CreateCardList(cList models.CardListDTO) error {
+	//res, err := db.Exec("INSERT INTO Card_Lists (name) VALUES ($1) RETURNING id;", cList.Name)
+
+	var lastId int
+
+	err := db.Get(&lastId, "INSERT INTO Card_Lists (name) VALUES ($1) RETURNING id;", cList.Name)
+
+	_, err = db.Exec("INSERT INTO card_lists_to_card_table (cardtable_id, cardlist_id ) VALUES ($1, $2);", cList.TableId, lastId)
+
+	return err
+}
+
+func CreateCard(card models.CardDTO) error {
+	var lastId int
+
+	err := db.Get(&lastId, "INSERT INTO Card (name, description) VALUES ($1, $2) RETURNING id;", card.Name, card.Description)
+
+	_, err = db.Exec("INSERT INTO cards_to_card_list (card_id, cardlist_id ) VALUES ($1, $2);", lastId, card.CardListId)
+
+	return err
+}
+
+func InitDBConnection() {
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+
+	dbConn, err := sqlx.Connect("postgres", psqlInfo)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	db = dbConn
+}
 
 func convertIntArrToInt64(items []int) []int64 {
 	var converted = make([]int64, len(items))
@@ -39,7 +93,7 @@ func buildIdsString(Ids []int) string {
 
 }
 
-func GetAllTables(db *sqlx.DB) []models.CardTable {
+func GetAllTables() []models.CardTable {
 
 	tables := []models.CardTable{}
 	err := db.Select(&tables, "SELECT id, name FROM card_tables ORDER BY id ASC")
@@ -51,7 +105,7 @@ func GetAllTables(db *sqlx.DB) []models.CardTable {
 }
 
 //GetCListsToCTableLinks
-func GetCListToCTableIds(db *sqlx.DB, tableId int) ([]int, []models.CListsToCTableLink) {
+func GetCListToCTableIds(tableId int) ([]int, []models.CListsToCTableLink) {
 
 	cListsToCTableLinks := []models.CListsToCTableLink{}
 	err := db.Select(&cListsToCTableLinks, "SELECT cardlist_id, cardtable_id FROM card_lists_to_card_table WHERE cardtable_id=$1", tableId)
@@ -69,7 +123,7 @@ func GetCListToCTableIds(db *sqlx.DB, tableId int) ([]int, []models.CListsToCTab
 	return cListIds, cListsToCTableLinks
 }
 
-func GetCListsByIds(db *sqlx.DB, cListIds []int) []models.CardList {
+func GetCListsByIds(cListIds []int) []models.CardList {
 
 	cardLists := []models.CardList{}
 	err := db.Select(&cardLists, "SELECT id, name FROM Card_Lists WHERE id IN("+buildIdsString(cListIds)+");")
@@ -80,7 +134,7 @@ func GetCListsByIds(db *sqlx.DB, cListIds []int) []models.CardList {
 	return cardLists
 }
 
-func GetCardsToClistLinksByIds(db *sqlx.DB, cardListsIds []int) []models.CardsToClistLink {
+func GetCardsToClistLinksByIds(cardListsIds []int) []models.CardsToClistLink {
 	cardsToClistLinks := []models.CardsToClistLink{}
 	err := db.Select(&cardsToClistLinks, "SELECT cardlist_id, card_id FROM cards_to_card_list WHERE cardlist_id IN("+buildIdsString(cardListsIds)+");")
 	if err != nil {
@@ -90,14 +144,18 @@ func GetCardsToClistLinksByIds(db *sqlx.DB, cardListsIds []int) []models.CardsTo
 	return cardsToClistLinks
 }
 
-func GetAssignedCardsToCLists(db *sqlx.DB, cardLists []models.CardList) []models.CardList {
+func GetAssignedCardsToCLists(cardLists []models.CardList) []models.CardList {
 	cardListsIds := make([]int, len(cardLists))
 
 	for i, el := range cardLists {
 		cardListsIds[i] = el.Id
 	}
 
-	cardsToClistLinks := GetCardsToClistLinksByIds(db, cardListsIds)
+	cardsToClistLinks := GetCardsToClistLinksByIds(cardListsIds)
+
+	if len(cardsToClistLinks) == 0 {
+		return cardLists
+	}
 
 	var cardsIds []int
 
@@ -136,13 +194,13 @@ func GetAssignedCardsToCLists(db *sqlx.DB, cardLists []models.CardList) []models
 }
 
 // only assign CardLists with assigned Cards to CardLists
-func GetFullTableByTable(db *sqlx.DB, table models.CardTable) models.CardTable {
+func GetFullTableByTable(table models.CardTable) models.CardTable {
 
-	cListIds, _ := GetCListToCTableIds(db, table.Id)
+	cListIds, _ := GetCListToCTableIds(table.Id)
 
-	cardLists := GetCListsByIds(db, cListIds)
+	cardLists := GetCListsByIds(cListIds)
 
-	cardLists = GetAssignedCardsToCLists(db, cardLists)
+	cardLists = GetAssignedCardsToCLists(cardLists)
 
 	table.CardLists = cardLists
 

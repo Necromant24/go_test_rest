@@ -1,10 +1,11 @@
 package main
 
 import (
+	"test/DB"
+	"test/api"
 	"test/some"
 
 	"fmt"
-	"test/DB"
 )
 
 const (
@@ -27,6 +28,12 @@ func main() {
 
 	fmt.Println(psqlInfo)
 
-	DB.SeedDb()
+	//DB.SeedDb()
+
+	DB.InitDBConnection()
+
+	//DB.SeedDb()
+
+	api.Run()
 
 }
