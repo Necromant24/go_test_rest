@@ -198,6 +198,11 @@ func GetTableCardListsById(tableId int) []models.CardList {
 
 	cListIds, _ := GetCListToCTableIds(tableId)
 
+	if len(cListIds) == 0 {
+		var empty []models.CardList
+		return empty
+	}
+
 	cardLists := GetCListsByIds(cListIds)
 
 	cardLists = GetAssignedCardsToCLists(cardLists)
