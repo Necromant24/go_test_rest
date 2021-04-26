@@ -194,15 +194,13 @@ func GetAssignedCardsToCLists(cardLists []models.CardList) []models.CardList {
 }
 
 // only assign CardLists with assigned Cards to CardLists
-func GetFullTableByTable(table models.CardTable) models.CardTable {
+func GetTableCardListsById(tableId int) []models.CardList {
 
-	cListIds, _ := GetCListToCTableIds(table.Id)
+	cListIds, _ := GetCListToCTableIds(tableId)
 
 	cardLists := GetCListsByIds(cListIds)
 
 	cardLists = GetAssignedCardsToCLists(cardLists)
 
-	table.CardLists = cardLists
-
-	return table
+	return cardLists
 }

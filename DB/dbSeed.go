@@ -46,8 +46,6 @@ func SeedDb() {
 		InitDBConnection()
 	}
 
-	// exec the schema or fail; multi-statement Exec behavior varies between
-	// database drivers;  pq will exec them all, sqlite3 won't, ymmv
 	res := db.MustExec(dbInit)
 
 	fmt.Println(res.RowsAffected())
@@ -83,20 +81,12 @@ func SeedDb() {
 	tx.MustExec("INSERT INTO cards_to_card_list (cardlist_id, card_id) VALUES ($1, $2)", 3, 4)
 	tx.MustExec("INSERT INTO cards_to_card_list (cardlist_id, card_id) VALUES ($1, $2)", 4, 5)
 
-	// Named queries can use structs, so if you have an existing struct (i.e. person := &Person{}) that you have populated, you can pass it in as &person
-	//tx.NamedExec("INSERT INTO person (first_name, last_name, email) VALUES (:first_name, :last_name, :email)", &Person{"Jane", "Citizen", "jane.citzen@example.com"})
-
 	tx.Commit()
-
-	// tables := []models.CardTable{}
-	// err = db.Select(&tables, "SELECT id, name FROM card_tables ORDER BY id ASC")
 
 	tables := GetAllTables()
 
-	table := GetFullTableByTable(tables[0])
+	table := GetTableCardListsById(tables[0].Id)
 
 	fmt.Println(table)
-
-	fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA!!!!!!!!!!")
 
 }

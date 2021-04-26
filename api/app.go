@@ -2,7 +2,6 @@ package api
 
 import (
 	"test/DB"
-	"test/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,13 +26,7 @@ func Run() {
 			c.JSON(200, DB.GetAllTables())
 		})
 
-		apiArea.GET("/fulltable", func(c *gin.Context) {
-
-			var table models.CardTable
-			c.ShouldBindQuery(&table)
-
-			c.JSON(200, DB.GetFullTableByTable(table))
-		})
+		apiArea.GET("/tableCardLists", GetTableCardLists)
 
 		apiArea.POST("/table", CreateTable)
 
@@ -43,5 +36,5 @@ func Run() {
 
 	}
 
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.Run()
 }

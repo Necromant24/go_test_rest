@@ -30,3 +30,11 @@ func CreateCard(ctx *gin.Context) {
 
 	DB.CreateCard(card)
 }
+
+func GetTableCardLists(ctx *gin.Context) {
+	var table models.CardTable
+
+	ctx.ShouldBindQuery(&table)
+
+	ctx.JSON(200, DB.GetTableCardListsById(table.Id))
+}
