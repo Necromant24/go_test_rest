@@ -7,7 +7,7 @@ type Card struct {
 }
 
 type CardDTO struct {
-	Name        string `json:"name" db:"name"`
+	Name        string `json:"name" db:"name" binding:"required"`
 	Description string `json:"description" db:"description"`
 	CardListId  int    `json:"cardListId"`
 }

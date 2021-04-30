@@ -1,9 +1,9 @@
 package api
 
 import (
-	"test/DB"
-
 	"github.com/gin-gonic/gin"
+
+	"test/api/actions"
 )
 
 func Run() {
@@ -23,16 +23,16 @@ func Run() {
 		})
 
 		apiArea.GET("/tables", func(c *gin.Context) {
-			c.JSON(200, DB.GetAllTables())
+			c.JSON(200, actions.GetAllTables())
 		})
 
-		apiArea.GET("/tableCardLists", GetTableCardLists)
+		apiArea.GET("/tableCardLists", actions.GetTableCardLists)
 
-		apiArea.POST("/table", CreateTable)
+		apiArea.POST("/table", actions.CreateTable)
 
-		apiArea.POST("/cardlist", CreateCardList)
+		apiArea.POST("/cardlist", actions.CreateCardList)
 
-		apiArea.POST("/card", CreateCard)
+		apiArea.POST("/card", actions.CreateCard)
 
 	}
 

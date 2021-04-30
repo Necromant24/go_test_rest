@@ -1,0 +1,8 @@
+
+DROP TABLE card_tables CASCADE;
+
+DROP TABLE card_lists CASCADE;
+
+DROP TABLE card_to_card CASCADE;
+
+DROP TABLE card CASCADE;

@@ -7,6 +7,6 @@ type CardList struct {
 }
 
 type CardListDTO struct {
-	Name    string `json:"name" db:"name"`
+	Name    string `json:"name" db:"name" binding:"required"`
 	TableId int    `json:"table_id"`
 }
