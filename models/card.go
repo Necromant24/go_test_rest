@@ -13,6 +13,6 @@ type CardDTO struct {
 }
 
 type CardLink struct {
-	KeyId   int `db:"key_id"`
-	ValueId int `db:"value_id"`
+	KeyId   int `db:"key_id" json:"key_id"`
+	ValueId int `db:"value_id" json:"value_id"`
 }

@@ -35,9 +35,9 @@ func Run() {
 		apiArea.DELETE("/card/:id", actions.DeleteCard)
 		apiArea.DELETE("/cardLink", actions.DeleteCardLink)
 
-		apiArea.PATCH("/table/:id", actions.UpdateTable)
-		apiArea.PATCH("/cardList/:id", actions.UpdateCardList)
-		apiArea.PATCH("/card/:id", actions.UpdateCard)
+		apiArea.PATCH("/table", actions.UpdateTable)
+		apiArea.PATCH("/cardList", actions.UpdateCardList)
+		apiArea.PATCH("/card", actions.UpdateCard)
 
 	}
 

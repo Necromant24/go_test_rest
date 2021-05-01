@@ -18,7 +18,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"proj 3\"\r\n}"
+					"raw": "{\r\n    \"name\": \"proj 8\",\r\n    \"briefDescription\": \"some test project\"\r\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/table",
@@ -48,7 +48,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"list tost 2\",\r\n    \"table_id\": 2\r\n}"
+					"raw": "{\r\n    \"name\": \"list tost 56\",\r\n    \"table_id\": 2\r\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/cardlist",
@@ -78,7 +78,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"TyDY\",\r\n    \"description\": \"ochen mnogo description\",\r\n    \"cardListId\": 5\r\n}"
+					"raw": "{\r\n    \"name\": \"TyDY\",\r\n    \"description\": \"ochen mnogo description\",\r\n    \"cardListId\": 4\r\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/card",
@@ -96,12 +96,22 @@
 			"response": []
 		},
 		{
-			"name": "get table list",
+			"name": "create card link",
 			"request": {
-				"method": "GET",
-				"header": [],
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"key_id\": 2,\r\n    \"value_id\": 4\r\n}"
+				},
 				"url": {
-					"raw": "http://localhost:8080/api/tables",
+					"raw": "http://localhost:8080/api/cardLink",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -109,19 +119,19 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"tables"
+						"cardLink"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "get table card lists with assigned cards to CLists",
+			"name": "get table list",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/api/tableCardLists?id=1",
+					"raw": "http://localhost:8080/api/table",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -129,13 +139,202 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"tableCardLists"
+						"table"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get full table",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/table/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
 					],
-					"query": [
-						{
-							"key": "id",
-							"value": "1"
-						}
+					"port": "8080",
+					"path": [
+						"api",
+						"table",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "card",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 2,\r\n    \"name\": \"TyDY toster\",\r\n    \"description\": \"ochen mnogo description\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/card",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"card"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "card list",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"list sgrsfbsdb 2 \",\r\n    \"id\": 2\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/cardList",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"cardList"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "table",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 1,\r\n    \"name\": \"proj 4\",\r\n    \"briefDescription\": \"some test project dgdfg\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/table",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"table"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete card link",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/cardLink/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"cardLink",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete card",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/card/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"card",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete card list",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/cardList/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"cardList",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "table",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/table/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"table",
+						"1"
 					]
 				}
 			},
