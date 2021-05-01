@@ -83,10 +83,10 @@ func SeedDb() {
 
 	tx.Commit()
 
-	tables := GetAllTables()
+	//tables := GetAllTables()
 
-	table := GetTableCardListsById(tables[0].Id)
+	//table := GetTableCardListsById(tables[0].Id)
 
-	fmt.Println(table)
+	//fmt.Println(table)
 
 }

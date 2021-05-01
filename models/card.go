@@ -11,3 +11,8 @@ type CardDTO struct {
 	Description string `json:"description" db:"description"`
 	CardListId  int    `json:"cardListId"`
 }
+
+type CardLink struct {
+	KeyId   int `db:"key_id"`
+	ValueId int `db:"value_id"`
+}

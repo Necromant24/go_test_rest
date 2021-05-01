@@ -32,3 +32,16 @@ func DeleteCard(cardId int) error {
 
 	return err
 }
+
+func CreateLink(link models.CardLink) error {
+	_, err := db.Exec("INSERT INTO card_to_card (key_id, value_id) VALUES($1, $2);",
+		link.KeyId, link.ValueId)
+
+	return err
+}
+
+func DeleteLink(keyId int) error {
+	_, err := db.Exec("DELETE FROM card_to_card WHERE id = $1", keyId)
+
+	return err
+}
